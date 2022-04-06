@@ -78,9 +78,7 @@ class BookInstance(models.Model):
 
     @property
     def is_overdue(self):
-        if self.due_back and date.today() > self.due_back:
-            return True
-        return False
+        return self.due_back and date.today() > self.due_back
 
     LOAN_STATUS = (
         ('d', 'Maintenance'),
@@ -122,11 +120,3 @@ class Author(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return '{0}, {1}'.format(self.last_name, self.first_name)
-
-© 2022
-GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-D
