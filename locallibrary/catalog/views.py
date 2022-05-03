@@ -32,6 +32,7 @@ from django.views import generic
 
 class BookListView(generic.ListView):
     model = Book
+    paginate_by = 10
 
     # context_object_name = 'book_list'   # your own name for the list as a template variable
     # queryset = Book.objects.filter(title__icontains='war')[:5] # Get 5 books containing the title war
@@ -46,3 +47,7 @@ class BookListView(generic.ListView):
     #     # Create any data and add it to the context
     #     context['some_data'] = 'This is just some data'
     #     return context
+
+
+class BookDetailView(generic.DetailView):
+    model = Book
