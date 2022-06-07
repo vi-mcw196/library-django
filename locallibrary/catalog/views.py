@@ -11,8 +11,8 @@ from django.urls import reverse
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
-from forms import RenewBookModelForm
-from models import Author
+from .forms import RenewBookModelForm
+from .models import Author
 from .models import Book, BookInstance
 
 
