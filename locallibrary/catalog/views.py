@@ -65,6 +65,17 @@ class BookDetailView(generic.DetailView):
     model = Book
 
 
+class LoanedBooksAllListView(PermissionRequiredMixin, generic.ListView):
+    """Generic class-based view listing all books on loan. Only visible to users with can_mark_returned permission."""
+    model = BookInstance
+    permission_required = 'catalog.can_mark_returned'
+    template_name = 'catalog/bookinstance_list_borrowed_all.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(status__exact='o').order_by('due_back')
+
+
 def book_detail_view(request, primary_key):
     book = get_object_or_404(Book, pk=primary_key)
     return render(request, 'catalog/book_detail.html', context={'book': book})
