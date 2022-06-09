@@ -3,7 +3,7 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -23,7 +23,7 @@ def index(request):
     num_instances = BookInstance.objects.all().count()
     # Available copies of books
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
-    num_authors = Author.objects.count()  # The 'all()' is implied by default.
+    num_authors = Author.objects.count()
 
     # Number of visits to this view, as counted in the session variable.
     num_visits = request.session.get('num_visits', 1)
@@ -65,6 +65,11 @@ class BookDetailView(generic.DetailView):
     model = Book
 
 
+def book_detail_view(request, primary_key):
+    book = get_object_or_404(Book, pk=primary_key)
+    return render(request, 'catalog/book_detail.html', context={'book': book})
+
+
 class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     """Generic class-based view listing books on loan to current user."""
     model = BookInstance
@@ -81,15 +86,12 @@ def renew_book_librarian(request, pk):
     """View function for renewing a specific BookInstance by librarian."""
     book_instance = get_object_or_404(BookInstance, pk=pk)
 
-    # If this is a POST request then process the Form data
     if request.method == 'POST':
 
-        # Create a form instance and populate it with data from the request (binding):
         form = RenewBookModelForm(request.POST)
 
         # Check if the form is valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             book_instance.due_back = form.cleaned_data['renewal_date']
             book_instance.save()
 
@@ -117,9 +119,28 @@ class AuthorCreate(CreateView):
 
 class AuthorUpdate(UpdateView):
     model = Author
-    fields = '__all__'  # Not recommended (potential security issue if more fields added)
+    fields = '__all__'
 
 
 class AuthorDelete(DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
+
+
+# Classes created for the forms challenge
+class BookCreate(PermissionRequiredMixin, CreateView):
+    model = Book
+    fields = ['title', 'author', 'summary', 'isbn', 'genre', 'language']
+    permission_required = 'catalog.can_mark_returned'
+
+
+class BookUpdate(PermissionRequiredMixin, UpdateView):
+    model = Book
+    fields = ['title', 'author', 'summary', 'isbn', 'genre', 'language']
+    permission_required = 'catalog.can_mark_returned'
+
+
+class BookDelete(PermissionRequiredMixin, DeleteView):
+    model = Book
+    success_url = reverse_lazy('books')
+    permission_required = 'catalog.can_mark_returned'
