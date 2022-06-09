@@ -128,19 +128,19 @@ class AuthorDelete(DeleteView):
 
 
 # Classes created for the forms challenge
-class BookCreate(PermissionRequiredMixin, CreateView):
+class BookCreate(CreateView):
     model = Book
     fields = ['title', 'author', 'summary', 'isbn', 'genre', 'language']
     permission_required = 'catalog.can_mark_returned'
 
 
-class BookUpdate(PermissionRequiredMixin, UpdateView):
+class BookUpdate(UpdateView):
     model = Book
     fields = ['title', 'author', 'summary', 'isbn', 'genre', 'language']
     permission_required = 'catalog.can_mark_returned'
 
 
-class BookDelete(PermissionRequiredMixin, DeleteView):
+class BookDelete(DeleteView):
     model = Book
     success_url = reverse_lazy('books')
     permission_required = 'catalog.can_mark_returned'
